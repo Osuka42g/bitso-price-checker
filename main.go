@@ -45,7 +45,10 @@ func main() {
 }
 
 func onReady() {
-	systray.SetIcon(getIcon("assets/" + currentCurrency + ".ico"))
+	sysicon, err := getIcon("assets/" + currentCurrency + ".ico")
+	if err == nil {
+		systray.SetIcon(sysicon)
+	}
 	systray.SetTitle("Bitso!")
 	systray.SetTooltip("Loading data.")
 
@@ -106,7 +109,10 @@ func onReady() {
 }
 
 func setDefaultCurrency(c string) {
-	systray.SetIcon(getIcon("assets/" + c + ".ico"))
+	sysicon, err := getIcon("assets/" + currentCurrency + ".ico")
+	if err == nil {
+		systray.SetIcon(sysicon)
+	}
 	currentCurrency = c
 	updateSystray()
 }
@@ -138,10 +144,10 @@ func updateSystray() {
 	systray.SetTooltip("Updated on " + storedValues[currentCurrency].UpdatedOn)
 }
 
-func getIcon(s string) []byte {
+func getIcon(s string) ([]byte, error) {
 	b, err := ioutil.ReadFile(s)
 	if err != nil {
 		fmt.Print(err)
 	}
-	return b
+	return b, err
 }
