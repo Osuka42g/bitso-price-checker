@@ -69,9 +69,9 @@ func onReady() {
 		for {
 			select {
 			case <-btcItem.ClickedCh:
-				setCurrency("btc")
+				setDefaultCurrency("btc")
 			case <-ethItem.ClickedCh:
-				setCurrency("eth")
+				setDefaultCurrency("eth")
 			}
 		}
 	}()
@@ -81,7 +81,7 @@ func updateCurrency(c string) {
 
 }
 
-func setCurrency(c string) {
+func setDefaultCurrency(c string) {
 	systray.SetIcon(getIcon("assets/" + c + ".ico"))
 
 }
