@@ -71,8 +71,6 @@ func onReady() {
 				payload.UpdatedOn = humanizeDate(payload.Created)
 				storedValues[c] = payload
 
-				fmt.Println(payload)
-
 				switch c {
 				case "btc":
 					btcItem.SetTitle("Btc: $" + payload.DisplayValue)
@@ -133,9 +131,7 @@ func humanizeCurrency(s string) string {
 }
 
 func humanizeDate(s string) string {
-	// Mon Jan 2 15:04:05 -0700 MST 2006
 	t, _ := time.Parse("2006-01-02T15:04:05+00:00", s)
-	fmt.Println()
 	return t.Format("15:04:05")
 }
 
