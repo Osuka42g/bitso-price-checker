@@ -95,10 +95,6 @@ func onReady() {
 	}()
 }
 
-func updateCurrency(c string, payload currencyPayload) {
-
-}
-
 func setDefaultCurrency(c string) {
 	systray.SetIcon(getIcon("assets/" + c + ".ico"))
 	currentCurrency = c
