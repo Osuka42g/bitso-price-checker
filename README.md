@@ -1,5 +1,5 @@
 # bitso-price-checker
-Bitcoin/Ethereum price checker in mexican pesos, for bitso.com exchanger.
+Bitcoin/Ethereum/Ripple price checker in mexican pesos, for bitso.com exchanger.
 
 ### Usage
 ```
