@@ -19,16 +19,17 @@ type bitsoResponse struct {
 }
 
 type currencyPayload struct {
-	Success bool   `json:success`
-	High    string `json:high`
-	Last    string `json:last`
-	Created string `json:created_at`
-	Book    string `json:book`
-	Volume  string `json:volume`
-	Vwap    string `json:vwap`
-	Low     string `json:low`
-	Ask     string `json:ask`
-	Bid     string `json:bid`
+	Success      bool   `json:success`
+	High         string `json:high`
+	Last         string `json:last`
+	Created      string `json:created_at`
+	Book         string `json:book`
+	Volume       string `json:volume`
+	Vwap         string `json:vwap`
+	Low          string `json:low`
+	Ask          string `json:ask`
+	Bid          string `json:bid`
+	DisplayValue string
 }
 
 const bitsoAPI = "https://api.bitso.com/v3/ticker/?book="
@@ -37,6 +38,7 @@ const pingTime = 10 // in seconds, consider Bitso limit is 300 request p/minute 
 
 var currencies = []string{"btc", "eth"}
 var currentCurrency = currencies[0]
+var storedValues = map[string]currencyPayload{}
 
 func main() {
 	systray.Run(onReady, onExit)
@@ -61,20 +63,19 @@ func onReady() {
 					fmt.Println(err)
 				}
 				payload := bitsoResponse.Payload
-				payload.Bid = humanReadable(payload.Bid)
+				payload.DisplayValue = humanReadable(payload.Bid)
+				storedValues[c] = payload
 
 				switch c {
 				case "btc":
-					btcItem.SetTitle("Btc: $" + payload.Bid)
+					btcItem.SetTitle("Btc: $" + payload.DisplayValue)
 					btcItem.SetTooltip("Updated on " + payload.Created)
 				case "eth":
-					ethItem.SetTitle("Eth: $" + payload.Bid)
+					ethItem.SetTitle("Eth: $" + payload.DisplayValue)
 					ethItem.SetTooltip("Updated on " + payload.Created)
 				}
 
-				if c == currentCurrency {
-					updateSystray("$"+payload.Bid, "Updated on "+payload.Created)
-				}
+				updateSystray()
 
 				time.Sleep(pingTime * time.Second)
 			}
@@ -101,6 +102,7 @@ func updateCurrency(c string, payload currencyPayload) {
 func setDefaultCurrency(c string) {
 	systray.SetIcon(getIcon("assets/" + c + ".ico"))
 	currentCurrency = c
+	updateSystray()
 }
 
 func onExit() {}
@@ -118,9 +120,9 @@ func humanReadable(s string) string {
 	return string(humanize.Commaf(i))
 }
 
-func updateSystray(t string, tt string) {
-	systray.SetTitle(t)
-	systray.SetTooltip(tt)
+func updateSystray() {
+	systray.SetTitle("$" + storedValues[currentCurrency].DisplayValue)
+	systray.SetTooltip("Updated on " + storedValues[currentCurrency].Created)
 }
 
 func getIcon(s string) []byte {
