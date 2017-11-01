@@ -36,7 +36,7 @@ const bitsoAPI = "https://api.bitso.com/v3/ticker/?book="
 const convertTo = "_mxn"
 const pingTime = 10 // in seconds, consider Bitso limit is 300 request p/minute and we make len(currencies) queries per time
 
-var currencies = []string{"btc", "eth"}
+var currencies = []string{"btc", "eth", "xrp"}
 var currentCurrency = currencies[0]
 var storedValues = map[string]currencyPayload{}
 
@@ -51,6 +51,7 @@ func onReady() {
 
 	btcItem := systray.AddMenuItem("Bitcoin", "")
 	ethItem := systray.AddMenuItem("Ethereum", "")
+	xrpItem := systray.AddMenuItem("Ripple", "")
 
 	for _, c := range currencies {
 		go func(c string) {
@@ -76,6 +77,9 @@ func onReady() {
 				case "eth":
 					ethItem.SetTitle("Eth: $" + payload.DisplayValue)
 					ethItem.SetTooltip("Updated on " + payload.UpdatedOn)
+				case "xrp":
+					xrpItem.SetTitle("Xrp: $" + payload.DisplayValue)
+					xrpItem.SetTooltip("Updated on " + payload.UpdatedOn)
 				}
 
 				updateSystray()
@@ -94,6 +98,8 @@ func onReady() {
 				setDefaultCurrency("btc")
 			case <-ethItem.ClickedCh:
 				setDefaultCurrency("eth")
+			case <-xrpItem.ClickedCh:
+				setDefaultCurrency("xrp")
 			}
 		}
 	}()
