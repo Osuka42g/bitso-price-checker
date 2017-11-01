@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/dustin/go-humanize"
-
 	"github.com/getlantern/systray"
 )
 
@@ -22,7 +21,7 @@ type currencyPayload struct {
 	Success      bool   `json:success`
 	High         string `json:high`
 	Last         string `json:last`
-	Created      string `json:created_at`
+	Created      string `json:"created_at"`
 	Book         string `json:book`
 	Volume       string `json:volume`
 	Vwap         string `json:vwap`
@@ -30,6 +29,7 @@ type currencyPayload struct {
 	Ask          string `json:ask`
 	Bid          string `json:bid`
 	DisplayValue string
+	UpdatedOn    string
 }
 
 const bitsoAPI = "https://api.bitso.com/v3/ticker/?book="
@@ -63,16 +63,19 @@ func onReady() {
 					fmt.Println(err)
 				}
 				payload := bitsoResponse.Payload
-				payload.DisplayValue = humanReadable(payload.Bid)
+				payload.DisplayValue = humanizeCurrency(payload.Bid)
+				payload.UpdatedOn = humanizeDate(payload.Created)
 				storedValues[c] = payload
+
+				fmt.Println(payload)
 
 				switch c {
 				case "btc":
 					btcItem.SetTitle("Btc: $" + payload.DisplayValue)
-					btcItem.SetTooltip("Updated on " + payload.Created)
+					btcItem.SetTooltip("Updated on " + payload.UpdatedOn)
 				case "eth":
 					ethItem.SetTitle("Eth: $" + payload.DisplayValue)
-					ethItem.SetTooltip("Updated on " + payload.Created)
+					ethItem.SetTooltip("Updated on " + payload.UpdatedOn)
 				}
 
 				updateSystray()
@@ -80,6 +83,7 @@ func onReady() {
 				time.Sleep(pingTime * time.Second)
 			}
 		}(c)
+		time.Sleep(100 * time.Millisecond) // avoid concurrent map writes, need to refactor this way
 	}
 
 	// Listeners for menu items
@@ -111,14 +115,21 @@ func fetchBitsoData(c string) *http.Response {
 	return res
 }
 
-func humanReadable(s string) string {
+func humanizeCurrency(s string) string {
 	i, _ := strconv.ParseFloat(s, 64)
 	return string(humanize.Commaf(i))
 }
 
+func humanizeDate(s string) string {
+	// Mon Jan 2 15:04:05 -0700 MST 2006
+	t, _ := time.Parse("2006-01-02T15:04:05+00:00", s)
+	fmt.Println()
+	return t.Format("15:04:05")
+}
+
 func updateSystray() {
 	systray.SetTitle("$" + storedValues[currentCurrency].DisplayValue)
-	systray.SetTooltip("Updated on " + storedValues[currentCurrency].Created)
+	systray.SetTooltip("Updated on " + storedValues[currentCurrency].UpdatedOn)
 }
 
 func getIcon(s string) []byte {
