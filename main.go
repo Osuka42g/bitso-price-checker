@@ -67,7 +67,7 @@ func onReady() {
 					fmt.Println(err)
 				}
 				payload := bitsoResponse.Payload
-				payload.DisplayValue = humanizeCurrency(payload.Bid)
+				payload.DisplayValue = humanizeCurrency(payload.Last)
 				payload.UpdatedOn = humanizeDate(payload.Created)
 				storedValues[c] = payload
 
