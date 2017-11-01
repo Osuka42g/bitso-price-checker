@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
+
+	"github.com/dustin/go-humanize"
 
 	"github.com/getlantern/systray"
 )
@@ -58,7 +61,7 @@ func onReady() {
 					fmt.Println(err)
 				}
 				payload := bitsoResponse.Payload
-				fmt.Println(payload)
+				payload.Bid = humanReadable(payload.Bid)
 
 				switch c {
 				case "btc":
@@ -108,6 +111,11 @@ func fetchBitsoData(c string) *http.Response {
 		panic(err)
 	}
 	return res
+}
+
+func humanReadable(s string) string {
+	i, _ := strconv.ParseFloat(s, 64)
+	return string(humanize.Commaf(i))
 }
 
 func updateSystray(t string, tt string) {
