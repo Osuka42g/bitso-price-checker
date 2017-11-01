@@ -30,7 +30,7 @@ type currencyPayload struct {
 
 const bitsoAPI = "https://api.bitso.com/v3/ticker/?book="
 const convertTo = "_mxn"
-const pingTime = 10 // in seconds, consider Bitso limit is 300 request p/minute.
+const pingTime = 10 // in seconds, consider Bitso limit is 300 request p/minute and we make len(currencies) queries per time
 
 var currencies = []string{"btc", "eth"}
 var currentCurrency = currencies[0]
@@ -60,11 +60,25 @@ func onReady() {
 				payload := bitsoResponse.Payload
 				fmt.Println(payload)
 
+				switch c {
+				case "btc":
+					btcItem.SetTitle("Btc: $" + payload.Bid)
+					btcItem.SetTooltip("Updated on " + payload.Created)
+				case "eth":
+					ethItem.SetTitle("Eth: $" + payload.Bid)
+					ethItem.SetTooltip("Updated on " + payload.Created)
+				}
+
+				if c == currentCurrency {
+					updateSystray("$"+payload.Bid, "Updated on "+payload.Created)
+				}
+
 				time.Sleep(pingTime * time.Second)
 			}
 		}(c)
 	}
 
+	// Listeners for menu items
 	go func() {
 		for {
 			select {
@@ -77,13 +91,13 @@ func onReady() {
 	}()
 }
 
-func updateCurrency(c string) {
+func updateCurrency(c string, payload currencyPayload) {
 
 }
 
 func setDefaultCurrency(c string) {
 	systray.SetIcon(getIcon("assets/" + c + ".ico"))
-
+	currentCurrency = c
 }
 
 func onExit() {}
@@ -97,7 +111,8 @@ func fetchBitsoData(c string) *http.Response {
 }
 
 func updateSystray(t string, tt string) {
-
+	systray.SetTitle(t)
+	systray.SetTooltip(tt)
 }
 
 func getIcon(s string) []byte {
