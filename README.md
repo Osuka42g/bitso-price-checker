@@ -2,7 +2,7 @@
 ![systray-bitso](https://user-images.githubusercontent.com/5117006/32278322-e91038e2-bf47-11e7-9a83-0c282a1d40e3.png)
 ---
 System tray app for Bitso.
-Bitcoin/Ethereum/Ripple price checker in mexican pesos, for bitso.com exchanger.
+Bitcoin/Ethereum/Ripple price checker in mexican pesos, for bitso.com exchange.
 
 ### Usage
 Recomended for now:
